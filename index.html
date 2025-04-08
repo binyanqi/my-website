@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Card: Cat</title>
+    <style>
+        :root {
+            --primary-color: #FFA07A;
+            --secondary-color: #FFE4E1;
+            --highlight-color: #FF6347;
+            --text-color: #333;
+            --light-text: #666;
+            --chinese-color: #4682B4;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .vocab-card {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .vocab-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-front {
+            transform: rotateY(0deg);
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .word-image-container {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .word-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .card-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .word-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .word {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+        
+        .pronunciation-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pronunciation {
+            font-size: 16px;
+            color: var(--light-text);
+            font-style: italic;
+        }
+        
+        .audio-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background-color: rgba(0,0,0,0.05);
+            margin-bottom: 5px;
+        }
+        
+        .audio-control:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .speaker-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .audio-control:hover .speaker-icon {
+            transform: scale(1.1);
+        }
+        
+        .word-type {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        
+        .definition-container {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .definition {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0 0 8px 0;
+        }
+        
+        .chinese-definition {
+            font-size: 15px;
+            color: var(--chinese-color);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .example-container {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .example {
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .example-text {
+            flex: 1;
+        }
+        
+        .highlight {
+            color: var(--highlight-color);
+            font-weight: bold;
+        }
+        
+        .example + .example {
+            margin-top: 12px;
+        }
+        
+        .example-audio-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .example-audio-btn {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .example-audio-btn:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .flip-instruction {
+            text-align: center;
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--light-text);
+            padding-top: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .vocab-card {
+                height: 450px;
+            }
+            
+            .word-image-container {
+                height: 180px;
+            }
+            
+            .card-content {
+                padding: 20px;
+            }
+            
+            .word {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="vocab-card" id="vocabCard">
+            <!-- 正面：英文单词和释义 -->
+            <div class="card-face card-front">
+                <div class="word-image-container">
+                    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Cute cat" class="word-image">
+                </div>
+                
+                <div class="card-content">
+                    <span class="word-type">noun</span>
+                    
+                    <div class="word-header">
+                        <div class="word-container">
+                            <h1 class="word">cat</h1>
+                            <div class="pronunciation-container">
+                                <span class="pronunciation">/kæt/</span>
+                                <div class="audio-control" onclick="playAudio('word')">
+                                    <svg class="speaker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--light-text)">
+                                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                    </svg>
+                                    <span>单词发音</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="definition-container">
+                        <p class="definition">
+                            A small furry animal with whiskers, short ears, and a long tail. People often keep them as pets.
+                        </p>
+                        <div class="audio-control" onclick="playAudio('english-definition')">
+                            <svg class="speaker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--light-text)">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                            </svg>
+                            <span>英文释义</span>
+                        </div>
+                        <p class="chinese-definition">
+                            猫，一种有胡须、短耳朵和长尾巴的小型毛茸茸动物，常被当作宠物饲养。
+                        </p>
+                        <div class="audio-control" onclick="playAudio('chinese-definition')">
+                            <svg class="speaker-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--light-text)">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                            </svg>
+                            <span>中文释义</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-instruction">
+                        点击翻转查看例句
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 背面：例句 -->
+            <div class="card-face card-back">
+                <div class="card-content">
+                    <div class="example-container">
+                        <p class="example">
+                            <span class="example-text">
+                                My <span class="highlight">cat</span> loves to sleep in sunny spots around the house.
+                                <span style="display:block;font-size:13px;color:var(--chinese-color);margin-top:4px;">我的猫喜欢在房子里阳光充足的地方睡觉。</span>
+                            </span>
+                            <div class="example-audio-controls">
+                                <div class="example-audio-btn" onclick="playAudio('example1-english')">英文例句</div>
+                                <div class="example-audio-btn" onclick="playAudio('example1-chinese')">中文例句</div>
+                            </div>
+                        </p>
+                        
+                        <p class="example">
+                            <span class="example-text">
+                                The <span class="highlight">cat</span> chased the mouse but didn't catch it.
+                                <span style="display:block;font-size:13px;color:var(--chinese-color);margin-top:4px;">那只猫追逐老鼠但没有抓到它。</span>
+                            </span>
+                            <div class="example-audio-controls">
+                                <div class="example-audio-btn" onclick="playAudio('example2-english')">英文例句</div>
+                                <div class="example-audio-btn" onclick="playAudio('example2-chinese')">中文例句</div>
+                            </div>
+                        </p>
+                    </div>
+                    
+                    <div class="flip-instruction">
+                        点击翻转回单词
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 卡片翻转功能
+        const vocabCard = document.getElementById('vocabCard');
+        vocabCard.addEventListener('click', function(e) {
+            // 排除点击音频控制按钮时的翻转
+            if (!e.target.closest('.audio-control') && !e.target.closest('.example-audio-btn')) {
+                this.classList.toggle('flipped');
+            }
+        });
+        
+        // 语音合成功能
+        function playAudio(type) {
+            if (!window.speechSynthesis) {
+                alert("您的浏览器不支持语音合成功能");
+                return;
+            }
+            
+            // 取消当前正在进行的语音
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance();
+            
+            switch(type) {
+                case 'word':
+                    utterance.text = "cat, spelled C-A-T";
+                    utterance.lang = 'en-US';
+                    break;
+                case 'english-definition':
+                    utterance.text = "A small furry animal with whiskers, short ears, and a long tail. People often keep them as pets.";
+                    utterance.lang = 'en-US';
+                    break;
+                case 'chinese-definition':
+                    utterance.text = "猫，一种有胡须、短耳朵和长尾巴的小型毛茸茸动物，常被当作宠物饲养。";
+                    utterance.lang = 'zh-CN';
+                    break;
+                case 'example1-english':
+                    utterance.text = "My cat loves to sleep in sunny spots around the house.";
+                    utterance.lang = 'en-US';
+                    break;
+                case 'example1-chinese':
+                    utterance.text = "我的猫喜欢在房子里阳光充足的地方睡觉。";
+                    utterance.lang = 'zh-CN';
+                    break;
+                case 'example2-english':
+                    utterance.text = "The cat chased the mouse but didn't catch it.";
+                    utterance.lang = 'en-US';
+                    break;
+                case 'example2-chinese':
+                    utterance.text = "那只猫追逐老鼠但没有抓到它。";
+                    utterance.lang = 'zh-CN';
+                    break;
+            }
+            
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
